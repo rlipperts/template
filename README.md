@@ -1,5 +1,5 @@
 # template loader
-Logger for simultaneous file and shell logging
+Template loader that loads common formats and replaces placeholders
 
 ## installation
 
