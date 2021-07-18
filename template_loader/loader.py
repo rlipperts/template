@@ -1,27 +1,29 @@
 from pathlib import Path
-from string import Template
 import logging
 import typing
+import re
+
 import json
+import yaml
+import toml
 
 logger = logging.getLogger(__name__)
 
-def instantiate_from_json(path: Path, **replacements: typing.Union[str, bool]):
-    # todo: Aint this bad practice? it is basically impossible to find this default replacement
-    replacements['cwd'] = str(Path.cwd())
+def load(path: Path, placeholder_marker_left='${', placeholder_marker_right='}', safe=True, **replacements: typing.Union[str, bool, int, float]):
+    with open(path) as template:
+        text = template.read()
+        template.close()
 
-    # todo: also load other file formats (yml, ..)
-    with open(path) as jsonFile:
-        data = json.load(jsonFile)
-        jsonFile.close()
+    if replacements:
+        left = re.escape(placeholder_marker_left)
+        right = re.escape(placeholder_marker_right)
+        # replace all placeholders in the string so we do not need to traverse the resulting datastructures
 
-        # todo: make this actually useful by replacing on multiple levels
-        if isinstance(data, str):
-            data = Template(data).safe_substitute(replacements)
-        elif isinstance(data, list):
-            data = [Template(v).safe_substitute(replacements) for v in data]
-        elif isinstance(data, dict):
-            data = {k: Template(v).safe_substitute(replacements) for k, v in data.items()}
-        else:
-            raise ValueError("Invalid data type in template file, couldn't load it!")
-        return data
+    if path.suffix == '.json':
+        data = json.loads(text)
+    elif path.suffix == '.yaml':
+        data = yaml.safe_load(text)
+    elif path.suffix == '.toml':
+        data = toml.loads(text)
+    else:
+        raise NotImplementedError('Cannot handle templates of Type %s' % path.suffix)
