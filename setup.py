@@ -12,7 +12,11 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/rlipperts/template",
-    packages=setuptools.find_packages(include='template_loader'),
+    packages=['template_loader'],
+    install_requires=[
+        'pyyaml',
+        'toml',
+    ],
     classifiers=[
         "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: MIT License",

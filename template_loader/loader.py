@@ -9,7 +9,8 @@ import toml
 
 logger = logging.getLogger(__name__)
 
-def load(path: Path, placeholder_marker_left='${', placeholder_marker_right='}', safe=True, **replacements: typing.Union[str, bool, int, float]):
+def load(path: Path, placeholder_marker_left='${', placeholder_marker_right='}',
+         safe=True, **replacements: typing.Union[str, bool, int, float]):
     with open(path) as template:
         text = template.read()
         template.close()
