@@ -1,0 +1,14 @@
+{
+  "test": {
+    "testA": ["testy", "testtest", "test replacement"],
+    "testB": 125,
+    "testC": {
+      "testD": {
+        "test": 3.14159
+      }
+    }
+  },
+  "testB": true,
+  "testC": 1.2345,
+  "replacement": "test"
+}

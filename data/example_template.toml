@@ -1,0 +1,10 @@
+testB = true
+testC = 1.2345
+"${placeholder}" = "test"
+
+[test]
+testA = [ "testy", "testtest", "test ${placeholder}" ]
+testB = 125
+
+[test.testC.testD]
+test = "${float_placeholder}"
