@@ -133,5 +133,8 @@ dmypy.json
 .cache/
 *~
 
-### Intellij ###
+# Intellij
 .idea/
+
+# output folder
+out/
