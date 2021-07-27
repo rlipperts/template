@@ -12,7 +12,8 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/rlipperts/template",
-    packages=['template_loader'],
+    packages=setuptools.find_packages(where='src'),
+    package_dir={'': 'src'},
     install_requires=[
         'pyyaml',
         'toml',
