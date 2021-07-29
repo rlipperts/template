@@ -8,8 +8,8 @@ import typing
 import re
 
 import json
-import yaml
-import toml
+import yaml  # type: ignore
+import toml  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,8 @@ def load(path: Path, placeholder_marker_left: str = '${', placeholder_marker_rig
         template.close()
 
     if replacements:
-        def replacer(match): return func_replacer(match, safe, **replacements)  #pylint: disable=C0321
+        # pylint: disable=C0321
+        def replacer(match): return func_replacer(match, safe, **replacements)
         pattern = build_pattern(placeholder_marker_left, placeholder_marker_right)
         text = re.sub(pattern, replacer, text)
 
