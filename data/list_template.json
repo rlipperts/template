@@ -1,0 +1,9 @@
+[
+  ["testy", "testtest", "test ${placeholder}"],
+  125,
+  {
+    "testD": {
+      "test": "${float_placeholder}"
+    }
+  }
+]

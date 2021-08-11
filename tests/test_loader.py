@@ -79,3 +79,9 @@ def test_template_load(file_ending):  # pylint: disable=C0116
     }
     check_me = loader.load(template_path, **replacements)
     assert check_me == correct_data
+
+
+def test_dict_only_load_errors_on_list_json():
+    template_path = Path.cwd() / 'data/list_template.json'
+    with pytest.raises(TypeError):
+        loader.load_dict(template_path)

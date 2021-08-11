@@ -20,6 +20,25 @@ class BadFormatError(json.JSONDecodeError, yaml.YAMLError, toml.TomlDecodeError)
     """
 
 
+def load_dict(path: Path, placeholder_marker_left: str = '${', placeholder_marker_right: str = '}',
+              safe=True, **replacements: typing.Union[str, bool, int, float]) -> dict:
+    """
+    Loads a template file from multiple possible formats while replacing placeholders.
+    :param path: Path to the template file
+    :param placeholder_marker_left: Left char/string that indicates a beginning placeholder
+    :param placeholder_marker_right: Right char/string that indicates an ending placeholder
+    :param safe: If True, placeholders that have no fitting replacement are ignored,
+    else an error is raised
+    :param replacements: Replacement of placeholders specified as keyword-args
+    :return: Python dict-representation of the loaded template.
+    """
+    data = load(path, placeholder_marker_left, placeholder_marker_right, safe, **replacements)
+    if isinstance(data, list):
+        LOGGER.error('Expected to find a dictionary-style formatted file!')
+        raise TypeError
+    return data
+
+
 def load(path: Path, placeholder_marker_left: str = '${', placeholder_marker_right: str = '}',
          safe=True, **replacements: typing.Union[str, bool, int, float]) \
         -> typing.Union[list, dict]:
