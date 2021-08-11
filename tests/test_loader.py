@@ -15,7 +15,8 @@ from template_loader import loader
                           ('testy_test testy-test-test', '${', '}'),
                           ('test', '<<', '>>'),
                           ('testy test testy-test-test', '<<', '>>'), ])
-def test_pattern_creation(placeholder: str, prefix: str, suffix: str):  #pylint: disable=C0116
+# pylint: disable=C0116
+def test_pattern_creation(placeholder: str, prefix: str, suffix: str):
     pattern = loader.build_pattern(prefix, suffix)
     text_fragment = ' Lorem ipsum dolor sit amet, consectetur adipiscing ' \
                     'elit, sed do eiusmod tempor incididunt ut labore et ' \
@@ -32,40 +33,42 @@ def test_pattern_creation(placeholder: str, prefix: str, suffix: str):  #pylint:
                          ['Lorem ${ipsum} dolor sit amet, consectetur adipiscing',
                           'Lorem ${ipsum} dolor sit amet, consectetur ${adipiscing}',
                           '${Lorem} ipsum dolor sit amet, consectetur ${adipiscing}', ])
-def test_func_replacer(text: str):  #pylint: disable=C0116
+def test_func_replacer(text: str):  # pylint: disable=C0116
     replacements = {
         'Lorem': 'Lorem',
         'ipsum': 'ipsum',
         'adipiscing': 'adipiscing',
     }
     clean_text = 'Lorem ipsum dolor sit amet, consectetur adipiscing'
-    def replacer(match): return loader.func_replacer(match, False, **replacements)  #pylint: disable=C0321
+    # pylint: disable=C0321
+    def replacer(match): return loader.func_replacer(match, False, **replacements)
     assert re.sub(loader.build_pattern('${', '}'), replacer, text) == clean_text
 
 
-def test_func_replacer_safe_ignores_missing_replacements():  #pylint: disable=C0116
+def test_func_replacer_safe_ignores_missing_replacements():  # pylint: disable=C0116
     replacements = {
         'ipsum': 'ipsum',
     }
     text = 'Lorem ${ipsum} dolor sit amet, consectetur ${adipiscing}'
     clean_text = 'Lorem ipsum dolor sit amet, consectetur ${adipiscing}'
-    def replacer(match): return loader.func_replacer(match, True, **replacements)  #pylint: disable=C0321
+    # pylint: disable=C0321
+    def replacer(match): return loader.func_replacer(match, True, **replacements)
     assert re.sub(loader.build_pattern('${', '}'), replacer, text) == clean_text
 
 
-def test_func_replacer_unsafe_errors_if_missing_replacements():  #pylint: disable=C0116
+def test_func_replacer_unsafe_errors_if_missing_replacements():  # pylint: disable=C0116
     replacements = {
         'ipsum': 'ipsum',
     }
     text = 'Lorem ${ipsum} dolor sit amet, consectetur ${adipiscing}'
-
-    def replacer(match): return loader.func_replacer(match, False, **replacements)  #pylint: disable=C0321
+    # pylint: disable=C0321
+    def replacer(match): return loader.func_replacer(match, False, **replacements)
     with pytest.raises(KeyError):
         re.sub(loader.build_pattern('${', '}'), replacer, text)
 
 
 @pytest.mark.parametrize('file_ending', ['json', 'yaml', 'toml'])
-def test_template_load(file_ending):  #pylint: disable=C0116
+def test_template_load(file_ending):  # pylint: disable=C0116
     result_path = Path.cwd() / 'data/replaced_placeholders.json'
     with open(result_path) as file:
         correct_data = json.load(file)

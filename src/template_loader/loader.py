@@ -11,7 +11,13 @@ import json
 import yaml  # type: ignore
 import toml  # type: ignore
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
+
+
+class BadFormatError(json.JSONDecodeError, yaml.YAMLError, toml.TomlDecodeError):
+    """
+    Common error class for decoding errors of the supported file types.
+    """
 
 
 def load(path: Path, placeholder_marker_left: str = '${', placeholder_marker_right: str = '}',
@@ -27,25 +33,37 @@ def load(path: Path, placeholder_marker_left: str = '${', placeholder_marker_rig
     :param replacements: Replacement of placeholders specified as keyword-args
     :return: Python representation of the loaded template.
     """
-    with open(path) as template:
-        text = template.read()
-        template.close()
+    try:
+        with open(path) as template:
+            text = template.read()
+            template.close()
+    except OSError as error:
+        LOGGER.error('Could not read from file %s', path)
+        LOGGER.error(
+            'Make sure the file exists and you have the appropriate rights to read from it')
+        raise error
 
     if replacements:
         # pylint: disable=C0321
         def replacer(match): return func_replacer(match, safe, **replacements)
+
         pattern = build_pattern(placeholder_marker_left, placeholder_marker_right)
         text = re.sub(pattern, replacer, text)
 
-    if path.suffix == '.json':
-        data = json.loads(text)
-    elif path.suffix == '.yaml':
-        data = yaml.safe_load(text)
-    elif path.suffix == '.toml':
-        data = toml.loads(text)
-    else:
-        raise NotImplementedError('Cannot handle templates of Type %s' % path.suffix)
-    return data
+    try:
+        if path.suffix == '.json':
+            data = json.loads(text)
+        elif path.suffix == '.yaml':
+            data = yaml.safe_load(text)
+        elif path.suffix == '.toml':
+            data = toml.loads(text)
+        else:
+            raise NotImplementedError('Cannot handle templates of Type %s' % path.suffix)
+        return data
+    except (json.JSONDecodeError, yaml.YAMLError, toml.TomlDecodeError) as error:
+        LOGGER.error('Could not decode file %s', path)
+        LOGGER.error('Make sure it is formatted accordingly to the %s standard', path.suffix[1:])
+        raise BadFormatError from error
 
 
 def build_pattern(placeholder_marker_left: str, placeholder_marker_right: str) -> re.Pattern[str]:
