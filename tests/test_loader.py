@@ -1,3 +1,4 @@
+# pylint: disable=missing-function-docstring,protected-access
 """
 Tests template_loader.loader
 """
@@ -15,7 +16,6 @@ from template_loader import loader
                           ('testy_test testy-test-test', '${', '}'),
                           ('test', '<<', '>>'),
                           ('testy test testy-test-test', '<<', '>>'), ])
-# pylint: disable=C0116
 def test_pattern_creation(placeholder: str, prefix: str, suffix: str):
     pattern = loader.build_pattern(prefix, suffix)
     text_fragment = ' Lorem ipsum dolor sit amet, consectetur adipiscing ' \
@@ -33,7 +33,7 @@ def test_pattern_creation(placeholder: str, prefix: str, suffix: str):
                          ['Lorem ${ipsum} dolor sit amet, consectetur adipiscing',
                           'Lorem ${ipsum} dolor sit amet, consectetur ${adipiscing}',
                           '${Lorem} ipsum dolor sit amet, consectetur ${adipiscing}', ])
-def test_func_replacer(text: str):  # pylint: disable=C0116
+def test_func_replacer(text: str):
     replacements = {
         'Lorem': 'Lorem',
         'ipsum': 'ipsum',
@@ -45,7 +45,7 @@ def test_func_replacer(text: str):  # pylint: disable=C0116
     assert re.sub(loader.build_pattern('${', '}'), replacer, text) == clean_text
 
 
-def test_func_replacer_safe_ignores_missing_replacements():  # pylint: disable=C0116
+def test_func_replacer_safe_ignores_missing_replacements():
     replacements = {
         'ipsum': 'ipsum',
     }
@@ -56,7 +56,7 @@ def test_func_replacer_safe_ignores_missing_replacements():  # pylint: disable=C
     assert re.sub(loader.build_pattern('${', '}'), replacer, text) == clean_text
 
 
-def test_func_replacer_unsafe_errors_if_missing_replacements():  # pylint: disable=C0116
+def test_func_replacer_unsafe_errors_if_missing_replacements():
     replacements = {
         'ipsum': 'ipsum',
     }
@@ -68,7 +68,7 @@ def test_func_replacer_unsafe_errors_if_missing_replacements():  # pylint: disab
 
 
 @pytest.mark.parametrize('file_ending', ['json', 'yaml', 'toml'])
-def test_template_load(file_ending):  # pylint: disable=C0116
+def test_template_load(file_ending):
     result_path = Path.cwd() / 'data/replaced_placeholders.json'
     with open(result_path) as file:
         correct_data = json.load(file)
@@ -81,7 +81,29 @@ def test_template_load(file_ending):  # pylint: disable=C0116
     assert check_me == correct_data
 
 
+def test_dict_only_load_returns_same_dict_as_normal_load():
+    template_path = Path.cwd() / 'data/example_template.json'
+    assert loader.load_dict(template_path) == loader.load(template_path)
+
+
 def test_dict_only_load_errors_on_list_json():
     template_path = Path.cwd() / 'data/list_template.json'
     with pytest.raises(TypeError):
         loader.load_dict(template_path)
+
+
+def test_list_only_load_returns_same_list_as_normal_load():
+    template_path = Path.cwd() / 'data/list_template.json'
+    assert loader.load_list(template_path) == loader.load(template_path)
+
+
+def test_list_only_load_errors_on_dict_json():
+    template_path = Path.cwd() / 'data/example_template.json'
+    with pytest.raises(TypeError):
+        loader.load_list(template_path)
+
+
+def test_list_only_load_errors_on_toml():
+    template_path = Path.cwd() / 'data/invalid_template.toml'
+    with pytest.raises(NotImplementedError):
+        loader.load_list(template_path)
